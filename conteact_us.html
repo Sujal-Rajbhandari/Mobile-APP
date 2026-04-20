@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact Us</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial, sans-serif;
+}
+
+body{
+  background:#f5f5f5;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+.container{
+  background:#f5f5f5;
+  padding:30px;
+  width:350px;
+  border-radius:10px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
+}
+
+h2{
+  text-align:center;
+  margin-bottom:20px;
+  color:#111;
+}
+
+.input-group{
+  margin-bottom:15px;
+}
+
+input, textarea{
+  width:100%;
+  padding:12px;
+  border:1px solid #f5f5f5;
+  border-radius:6px;
+  font-size:14px;
+}
+
+textarea{
+  resize:none;
+  height:120px;
+}
+
+button{
+  width:100%;
+  padding:12px;
+  border:none;
+  background:#111;
+  color:#f5f5f5;
+  font-size:15px;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#f5f5f5;
+}
+
+#message{
+  margin-top:15px;
+  text-align:center;
+  color:green;
+  font-size:14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h2>Contact Us</h2>
+
+  <form id="contactForm">
+    <div class="input-group">
+      <input type="text" id="name" placeholder="Your Name" required>
+    </div>
+
+    <div class="input-group">
+      <input type="email" id="email" placeholder="Your Email" required>
+    </div>
+
+    <div class="input-group">
+      <textarea id="messageBox" placeholder="Your Message" required></textarea>
+    </div>
+
+    <button type="submit">Send Message</button>
+  </form>
+
+  <p id="message"></p>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+  import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBlRoKKH9XdZyNZtAKHcBeDSGJvFLaMEqQ",
+    authDomain: "voicecall23-d57f6.firebaseapp.com",
+    projectId: "voicecall23-d57f6",
+    storageBucket: "voicecall23-d57f6.firebasestorage.app",
+    messagingSenderId: "528194432546",
+    appId: "1:528194432546:web:d57b2aabfd678a13ec247b",
+    measurementId: "G-CKX3GJL36F",
+    databaseURL: "https://voiceclz-default-rtdb.firebaseio.com/"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  const form = document.getElementById("contactForm");
+  const status = document.getElementById("message");
+  const submitButton = form.querySelector("button[type='submit']");
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const messageText = document.getElementById("messageBox").value.trim();
+
+    submitButton.disabled = true;
+    submitButton.textContent = "Sending...";
+
+    const newMessageRef = push(ref(db, "contactMessages"));
+    set(newMessageRef, {
+      name,
+      email,
+      message: messageText,
+      createdAt: new Date().toISOString()
+    })
+    .then(() => {
+      status.style.color = "green";
+      status.textContent = "Message sent successfully!";
+      form.reset();
+    })
+    .catch((error) => {
+      status.style.color = "red";
+      status.textContent = "Failed to send message. Check browser console for the Firebase error.";
+      console.error(error);
+    })
+    .finally(() => {
+      submitButton.disabled = false;
+      submitButton.textContent = "Send Message";
+    });
+  });
+</script>
+
+</body>
+</html>
